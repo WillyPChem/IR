@@ -1,0 +1,7 @@
+To Do List:
+
+1. Learn how to use git
+2. Evaluate and print functions
+3. Evaluate and print derivatives
+4. Evaluate and print function integrals
+5. Multiply matrices
