@@ -13,6 +13,7 @@ int main(){
   double x = 1.0;
   double alpha = 8.7e7;
   int n = 0;
+  // I'm editing!
 
   psi = Eigenfunction( 0.001, 8.7e8, 40);
 
