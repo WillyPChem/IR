@@ -1,0 +1,37 @@
+15 February 2017 09:16:20 PM
+
+HERMITE_POLYNOMIAL_PRB:
+  C++ version.
+  Test the HERMITE_POLYNOMIAL library.
+
+HERMITE_POLYNOMIAL_TEST01:
+  H_POLYNOMIAL_VALUES stores values of
+  the physicist's Hermite polynomials.
+  H_POLYNOMIAL_VALUE evaluates the polynomial.
+
+                        Tabulated                 Computed
+     N        X           H(N,X)                    H(N,X)                     Error
+
+     0             5                         1                         1         0
+     1             5                        10                        10         0
+     2             5                        98                        98         0
+     3             5                       940                       940         0
+     4             5                      8812                      8812         0
+     5             5                     80600                     80600         0
+     6             5                    717880                    717880         0
+     7             5                   6211600                   6211600         0
+     8             5                  52065680                  52065680         0
+     9             5                 421271200                 421271200         0
+    10             5                3275529760                3275529760         0
+    11             5               24329873600               24329873600         0
+    12             5              171237081280              171237081280         0
+     5             0                         0                         0         0
+     5           0.5                        41                        41         0
+     5             1                        -8                        -8         0
+     5             3                      3816                      3816         0
+     5            10                   3041200                   3041200         0
+
+HERMITE_POLYNOMIAL_PRB:
+  Normal end of execution.
+
+15 February 2017 09:16:20 PM
