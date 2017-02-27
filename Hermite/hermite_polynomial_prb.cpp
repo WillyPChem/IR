@@ -5,7 +5,7 @@
 # include <iomanip>
 # include <ctime>
 # include <cstring>
-# include <stdio.h>
+# includte_polynomial.hppm <stdio.h>
 using namespace std;
 
 # include "hermite_polynomial.hpp"
