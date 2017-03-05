@@ -6,6 +6,20 @@
 #include<malloc.h>
 
 double pi = 3.14159265359;
+
+// Function prototype for Runge-Kutta method for updated the wavefunction in time.
+// RK3 is going to take the current wavefunction (double complex *wfn) at time
+// t_i and update to its value at a future time t_f = t_i + dt 
+// Arguments to the function:
+//    arg1 - (int) dim - number of points in the wavefunction
+//    arg2 - (double) *xvec - vector of x-values that the wfn is evaluated at
+//    arg3 - (double complex) *wfn - vector that stores the wfn values at time t_i
+//           when the function is called, and when the function has been executed,
+//           this vector will hold the wfn values at time t_f = t_i + dt
+//    arg4 - (double) dx - differential step along x between subsequent points in *xvec
+//    arg5 - (double) dt - differential step along time between subsequent times (i.e. t_f - t_i)
+void RK3(int dim, double *xvec, double complex *wfn, double dx, double dt);
+
 void dfdt(int dim,double complex *psivec,double complex *dpsi,double dx);
 // Function for taking 2nd derivative
 // Arguments: arg1 - dim, number of pts in wavefxn
