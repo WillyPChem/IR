@@ -63,3 +63,63 @@ void dfdt(int dim,double complex *psivec,double complex *dpsi,double dx) {
 
 }
 
+void RK3(int dim, double *xvec, double complex *wfn, double dx, double dt) {
+
+  int i;
+  double complex *wfn_dot, *wfn2, *wfn3, *wfn_np1, *k1, *k2, *k3;
+  // Temporary arrays for computing derivatives of wfns and approximate updates to wfns
+  wfn_dot = (double complex *)malloc((dim+1)*sizeof(double complex));
+  wfn2 = (double complex *)malloc((dim+1)*sizeof(double complex));
+  wfn3 = (double complex *)malloc((dim+1)*sizeof(double complex));
+  wfn_np1 = (double complex *)malloc((dim+1)*sizeof(double complex));
+  k1 = (double complex *)malloc((dim+1)*sizeof(double complex));
+  k2 = (double complex *)malloc((dim+1)*sizeof(double complex));
+  k3 = (double complex *)malloc((dim+1)*sizeof(double complex));
+
+  // Must initialize all (real and imaginary parts of) these elements of the arrays to zero 
+  for (i=0; i<=dim; i++) {
+    wfn_dot[i] = 0. + 0.*I;
+    wfn2[i] = 0. + 0.*I;
+    wfn3[i] = 0. + 0.*I;
+    wfn_np1[i] = 0. + 0.*I;
+    k1[i] = 0. + 0.*I;
+    k2[i] = 0. + 0.*I;
+    k3[i] = 0. + 0.*I;
+
+  }
+
+  // Get dPsi(n)/dt at initial time!	
+  dfdt(dim, wfn, wfn_dot, dx);
+  // Compute approximate wfn update with Euler step
+  for (i=0; i<=dim; i++) {
+    k1[i] = dt*wfn_dot[i];
+    wfn2[i] = wfn[i] + k1[i]/2.;
+  }
+  // Get dPsi(n+k1/2)/dt
+  dfdt(dim, wfn2, wfn_dot, dx);
+  // Compute approximate wfn update with Euler step
+  for (i=0; i<=dim; i++) {
+    k2[i] = dt*wfn_dot[i];
+    wfn3[i] = wfn[i] + k2[i]/2.;
+  }
+  // Get dPsi(n+k2/2)/dt
+  dfdt(dim, wfn3, wfn_dot, dx);
+  // Compute approximate update with Euler step
+  // Then update actual wfn
+  for (i=0; i<=dim; i++) {
+    k3[i] = dt*wfn_dot[i];
+    wfn_np1[i] = wfn[i] + k1[i]/6. + 2.*k2[i]/3. + k3[i]/6.;
+    wfn[i] = wfn_np1[i];
+  }
+  // wfn vector has now been updated!  
+  // Now free memory associated with temporary vectors
+  free(wfn_dot);
+  free(wfn2);
+  free(wfn3);
+  free(wfn_np1);
+  free(k1);
+  free(k2);
+  free(k3);
+
+}
+
