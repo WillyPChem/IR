@@ -16,7 +16,10 @@ Step 4: Subtract -qE(t)x term
 double pi = 4*atan(1.);
 //double alpha = 8.386*pow(10,7);
 double alpha = 1.;
-double mu = 1.626*pow(10,-27);
+// Reduced mass in SI units
+//double mu = 1.626*pow(10,-27);
+// Reduced mass in atomic units
+double mu = 12000;
 double hbar = 1.0546*pow(10,-34);
 double q = 1.60*pow(10,-19);
 double k = 481.;
@@ -87,11 +90,13 @@ int main()
 */
     // Apply -hbar^2/2mu to Euler Step
     Hpsi(dim,wfn,dpsij,dx,x);
+    //void RK3(int dim, double *xvec, double complex *wfn, double dx, double dt) 
+    RK3(dim, x, wfn, dx, 0.001); 
 
-    // print dpsi/dt
+   // print dpsi/dt
     for (i=0; i<dim; i++)
 	{
-		printf("dpsi[%d] = %e %e * i\n",i,creal(dpsij[i]),cimag(dpsij[i]));
+		printf("dpsi[%d] = %e %e * i\n",i,creal(wfn[i]),cimag(wfn[i]));
 	}
 
     // Free memory
