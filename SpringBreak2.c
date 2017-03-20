@@ -13,13 +13,13 @@ Step 4: Subtract -qE(t)x term
 */
 
 // Global Constants
-double pi,alpha,mu,hbar,q,k;
-  pi = 4*arctan(1);
-  alpha = 8.386*pow(10,7);
-  mu = 1.626*pow(10,-27);
-  hbar = 1.0546*pow(10,-34);
-  q = 1.60*pow(10,-19);
-  k = 481.;
+double pi = 4*atan(1.);
+//double alpha = 8.386*pow(10,7);
+double alpha = 1.;
+double mu = 1.626*pow(10,-27);
+double hbar = 1.0546*pow(10,-34);
+double q = 1.60*pow(10,-19);
+double k = 481.;
 
 // Function Prototypes
 
@@ -31,7 +31,7 @@ void dfdt(int dim, double complex *psivec, double complex *dpsi, double dx);
 	// dx = increment along x axis
 
 // H hat applied to psi
-void Hpsi(int dim, double complex *dpsi, double complex *psivec, double complex *dpsij, double dx, double *x);
+void Hpsi(int dim, double complex *psivec, double complex *dpsij, double dx, double *x);
 	// dim = number of points in wavefxn
 	// psivec = array of wavefxn values
 	// d2psi = array of dpsi^2/dx^2 wavefxn values
@@ -78,26 +78,27 @@ int main()
 
 		// Particle in a box
 		//wfn[i] = sqrt(2./L)*sin(pi*x[i]/L) + 0.*I;
-		printf("wfn[%d] = %f %f*i\n",i,creal(wfn[i]),cimag(wfn[i]));
+		printf("wfn[%d] = %e %e*i\n",i,creal(wfn[i]),cimag(wfn[i]));
 	}
-	printf("\n\n");
-	// Euler Step
-	dfdt(dim,wfn,dpsij,dx);
 
+/*	printf("\n\n");
+	// Euler Step
+	// dfdt(dim,wfn,dpsij,dx);
+*/
     // Apply -hbar^2/2mu to Euler Step
-    Hpsi(dim,dpsi,wfn,dpsij,dx,x);
+    Hpsi(dim,wfn,dpsij,dx,x);
 
     // print dpsi/dt
     for (i=0; i<dim; i++)
 	{
-		printf("dpsi[%d] = %f %f*i\n",i,creal(dpsi[i]),cimag(dpsi[i]));
+		printf("dpsi[%d] = %e %e * i\n",i,creal(dpsij[i]),cimag(dpsij[i]));
 	}
 
     // Free memory
-    free(x);
-    free(wfn);
-    free(dpsi);
-    free(dpsij);
+//    free(x);
+//    free(wfn);
+//    free(dpsi);
+//    free(dpsij);
 
 	return 0;
 }
@@ -117,14 +118,28 @@ void dfdt(int dim,double complex *psivec,double complex *dpsij,double dx) {
 
 /* **************************************************************************************************** */
 
-void Hpsi(int dim, double complex *dpsi, double complex *psivec, double complex *dpsij, double dx, double *x)
+void Hpsi(int dim, double complex *psivec, double complex *dpsij, double dx, double *x)
 {
+
+   // A temporary vector for the second derivative of psivec
+   double complex *temp;
+   temp = (double complex *)malloc((dim+1)*sizeof(double complex));
+
+   // Call dfdt, which calculates the second derivative of psivec and multiplies it by i/2
+   dfdt(dim, psivec, temp, dx);
+   // dpsiij is the time derivative!
+   // It results from the action of the Hamiltonian on the current wavefunction!
+
+
 	int j;
 	for (j=0; j<dim; j++)
 	{
 		// (1) is placeholder for d^2/dx^2 aka dpsi[i]
-		dpsi[j] = - ((pow(hbar,2)/(2*mu))*(dpsi[i])) + ((0.5*k*pow(x[j],2))*(psivec[j])) - ((q*E(x[j])*x[j])*(psivec[j]));
+		dpsij[j] = temp[j]/mu - ((0.5*I*k*pow(x[j],2))*(psivec[j])) + (I*(q*E(x[j])*x[j])*(psivec[j]));
 	}
+
+
+   free(temp);
 }
 /* **************************************************************************************************** */
 
