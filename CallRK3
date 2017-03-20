@@ -176,8 +176,8 @@ void RK3(int dim, double *xvec, double complex *wfn, double dx, double dt) {
 	}
 
 	// Get dPsi(n)/dt at initial time!
-	dfdt(dim, wfn, wfn_dot, dx);
-
+	//dfdt(dim, wfn, wfn_dot, dx);
+        Hpsi(dim, wfn, wfn_dot, dx, xvec);
 	// Compute approximate wfn update with Euler step
 	for (i=0; i<=dim; i++)
 	{
@@ -186,8 +186,9 @@ void RK3(int dim, double *xvec, double complex *wfn, double dx, double dt) {
 	}
 
 	// Get dPsi(n+k1/2)/dt
-	dfdt(dim, wfn2, wfn_dot, dx);
-
+	//dfdt(dim, wfn2, wfn_dot, dx);
+        Hpsi(dim, wfn2, wfn_dot, dx, xvec);
+	
 	// Compute approximate wfn update with Euler step
 	for (i=0; i<=dim; i++)
 	{
@@ -196,8 +197,9 @@ void RK3(int dim, double *xvec, double complex *wfn, double dx, double dt) {
 	}
 
 	// Get dPsi(n+k2/2)/dt
-	dfdt(dim, wfn3, wfn_dot, dx);
-
+	//dfdt(dim, wfn3, wfn_dot, dx);
+        Hpsi(dim, wfn3, wfn_dot, dx, xvec);
+	
 	// Compute approximate update with Euler step
 
 	// Then update actual wfn
