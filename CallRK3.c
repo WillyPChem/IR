@@ -76,7 +76,7 @@ int main()
 	// Psi(x)
 	for (i=0; i<dim; i++)
 	{
-		x[i] = i*dx;
+		x[i] = (i-dim/2)*dx;
 		wfn[i] = pow(alpha/pi,1/4)*exp((-alpha/2)*pow(x[i],2));
 
 		// Particle in a box
@@ -93,7 +93,7 @@ int main()
     //void RK3(int dim, double *xvec, double complex *wfn, double dx, double dt) 
    
    for (int j=0; j<1000; j++){
-     RK3(dim, x, wfn, dx, 0.001); 
+     RK3(dim, x, wfn, dx, 0.005); 
 
      // print dpsi/dt
      printf("\n\n#%i\n",j+1);
