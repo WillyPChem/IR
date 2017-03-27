@@ -15,14 +15,16 @@ Step 4: Subtract -qE(t)x term
 // Global Constants
 double pi = 4*atan(1.);
 //double alpha = 8.386*pow(10,7);
-double alpha = 1.;
 // Reduced mass in SI units
 //double mu = 1.626*pow(10,-27);
 // iReduced mass in atomic units
 double mu = 1784 ;
-double hbar = 1.0546*pow(10,-34);
+//double hbar = 1.0546*pow(10,-34);
+double hbar = 1.;
 double q = 1.60*pow(10,-19);
 double k = 3.08845;
+double om = sqrt(k/mu);
+double alpha = mu*om;
 
 // Function Prototypes
 
@@ -77,7 +79,7 @@ int main()
 	for (i=0; i<dim; i++)
 	{
 		x[i] = (i-dim/2)*dx;
-		wfn[i] = pow(alpha/pi,1/4)*exp((-alpha/2)*pow(x[i],2));
+		wfn[i] = pow(alpha/pi,1./4)*exp((-alpha/2)*pow(x[i],2));
 
 		// Particle in a box
 		//wfn[i] = sqrt(2./L)*sin(pi*x[i]/L) + 0.*I;
@@ -110,7 +112,7 @@ int main()
      for (i=0; i<dim; i++)
 	{
          
-          double wfndot_an = creal(wfn_t[i]);
+          double wfndot_an = creal(E0*wfn_t[i]);
           double wfndot_nu = creal(dpsij[i]);
           //double rf  = creal(wfn[i]*cexp(-I*E0*t));
           //double imf = cimag(wfn[i]*cexp(-I*E0*t));
