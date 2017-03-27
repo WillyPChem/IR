@@ -79,7 +79,7 @@ int main()
 	for (i=0; i<dim; i++)
 	{
 		x[i] = (i-dim/2)*dx;
-		wfn[i] = pow(alpha/pi,1./4)*exp((-alpha/2)*pow(x[i],2));
+		wfn[i] = pow( (alpha/pi) , (1./4))*exp((-alpha/2.)*pow(x[i],2.));
 
 		// Particle in a box
 		//wfn[i] = sqrt(2./L)*sin(pi*x[i]/L) + 0.*I;
@@ -100,24 +100,25 @@ int main()
    wfn_t = (complex double *)malloc(dim*sizeof(complex double));
 
    for (int j=0; j<1000; j++){
-     //RK3(dim, x, wfn, dx, 0.005); 
+     RK3(dim, x, wfn, dx, 0.01); 
  
-     t = 0.1*j;
+     //t = 0.1*j;
      // print dpsi/dt
      printf("\n\n#%i\n",j+1);
-     for (i=0; i<dim; i++) {
+     /*for (i=0; i<dim; i++) {
        wfn_t[i] = wfn[i]*cexp(-I*E0*t);
      }
      Hpsi(dim, wfn_t, dpsij, dx, x);
+     */
      for (i=0; i<dim; i++)
 	{
          
-          double wfndot_an = creal(E0*wfn_t[i]);
-          double wfndot_nu = creal(dpsij[i]);
+          //double wfndot_an = creal(E0*wfn_t[i]);
+          //double wfndot_nu = creal(dpsij[i]);
           //double rf  = creal(wfn[i]*cexp(-I*E0*t));
           //double imf = cimag(wfn[i]*cexp(-I*E0*t));
-          printf("%f  %e  %e\n",x[i],wfndot_an,wfndot_nu);
-//		printf("%f %e %e \n",x[i],creal(wfn[i]),cimag(wfn[i]));
+          //printf("%f  %e  %e\n",x[i],wfndot_an,wfndot_nu);
+          printf("%f %e %e \n",x[i],creal(wfn[i]),cimag(wfn[i]));
 
 
 	}
