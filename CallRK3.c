@@ -18,11 +18,11 @@ double pi = 4*atan(1.);
 double alpha = 1.;
 // Reduced mass in SI units
 //double mu = 1.626*pow(10,-27);
-// Reduced mass in atomic units
-double mu = 12000;
+// iReduced mass in atomic units
+double mu = 1784 ;
 double hbar = 1.0546*pow(10,-34);
 double q = 1.60*pow(10,-19);
-double k = 481.;
+double k = 3.08845;
 
 // Function Prototypes
 
@@ -60,10 +60,10 @@ void RK3(int dim, double *xvec, double complex *wfn, double dx, double dt);
 int main()
 {
 	// Initialize & Define Variables
-	int dim = 10;
+	int dim = 100;
 	double *x;
 	double complex *wfn, *dpsi, *dpsij;
-	double L = 1.;
+	double L = 10.;
 	double dx = L/dim;
 	int i;
 
@@ -81,7 +81,7 @@ int main()
 
 		// Particle in a box
 		//wfn[i] = sqrt(2./L)*sin(pi*x[i]/L) + 0.*I;
-		printf("wfn[%d] = %e %e*i\n",i,creal(wfn[i]),cimag(wfn[i]));
+		//printf("wfn[%d] = %e %e*i\n",i,creal(wfn[i]),cimag(wfn[i]));
 	}
 
 /*	printf("\n\n");
@@ -91,13 +91,17 @@ int main()
     // Apply -hbar^2/2mu to Euler Step
     Hpsi(dim,wfn,dpsij,dx,x);
     //void RK3(int dim, double *xvec, double complex *wfn, double dx, double dt) 
-    RK3(dim, x, wfn, dx, 0.001); 
+   
+   for (int j=0; j<1000; j++){
+     RK3(dim, x, wfn, dx, 0.001); 
 
-   // print dpsi/dt
-    for (i=0; i<dim; i++)
+     // print dpsi/dt
+     printf("\n#%i\n",j+1);
+     for (i=0; i<dim; i++)
 	{
-		printf("dpsi[%d] = %e %e * i\n",i,creal(wfn[i]),cimag(wfn[i]));
+		printf("%f %e %e \n",x[i],creal(wfn[i]),cimag(wfn[i]));
 	}
+   }
 
     // Free memory
 //    free(x);
