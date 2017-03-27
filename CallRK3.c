@@ -97,7 +97,7 @@ int main()
    for (int j=0; j<1000; j++){
      //RK3(dim, x, wfn, dx, 0.005); 
  
-     t = 0.005*j;
+     t = 0.1*j;
      // print dpsi/dt
      printf("\n\n#%i\n",j+1);
      for (i=0; i<dim; i++)
