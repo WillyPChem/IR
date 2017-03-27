@@ -96,7 +96,7 @@ int main()
      RK3(dim, x, wfn, dx, 0.001); 
 
      // print dpsi/dt
-     printf("\n#%i\n",j+1);
+     printf("\n\n#%i\n",j+1);
      for (i=0; i<dim; i++)
 	{
 		printf("%f %e %e \n",x[i],creal(wfn[i]),cimag(wfn[i]));
