@@ -91,15 +91,23 @@ int main()
     // Apply -hbar^2/2mu to Euler Step
     Hpsi(dim,wfn,dpsij,dx,x);
     //void RK3(int dim, double *xvec, double complex *wfn, double dx, double dt) 
-   
+  
+   double E0 = sqrt(k/mu)/2.;
+   double t=0;
    for (int j=0; j<1000; j++){
-     RK3(dim, x, wfn, dx, 0.005); 
-
+     //RK3(dim, x, wfn, dx, 0.005); 
+ 
+     t = 0.005*j;
      // print dpsi/dt
      printf("\n\n#%i\n",j+1);
      for (i=0; i<dim; i++)
 	{
-		printf("%f %e %e \n",x[i],creal(wfn[i]),cimag(wfn[i]));
+          double rf  = creal(wfn[i]*cexp(-I*E0*t));
+          double imf = cimag(wfn[i]*cexp(-I*E0*t));
+          printf("%f  %e  %e\n",x[i],rf,imf);
+//		printf("%f %e %e \n",x[i],creal(wfn[i]),cimag(wfn[i]));
+
+
 	}
    }
 
