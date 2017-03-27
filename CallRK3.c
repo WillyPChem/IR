@@ -94,17 +94,27 @@ int main()
   
    double E0 = sqrt(k/mu)/2.;
    double t=0;
+   double complex *wfn_t;
+   wfn_t = (complex double *)malloc(dim*sizeof(complex double));
+
    for (int j=0; j<1000; j++){
      //RK3(dim, x, wfn, dx, 0.005); 
  
      t = 0.1*j;
      // print dpsi/dt
      printf("\n\n#%i\n",j+1);
+     for (i=0; i<dim; i++) {
+       wfn_t[i] = wfn[i]*cexp(-I*E0*t);
+     }
+     Hpsi(dim, wfn_t, dpsij, dx, x);
      for (i=0; i<dim; i++)
 	{
-          double rf  = creal(wfn[i]*cexp(-I*E0*t));
-          double imf = cimag(wfn[i]*cexp(-I*E0*t));
-          printf("%f  %e  %e\n",x[i],rf,imf);
+         
+          double wfndot_an = creal(wfn_t[i]);
+          double wfndot_nu = creal(dpsij[i]);
+          //double rf  = creal(wfn[i]*cexp(-I*E0*t));
+          //double imf = cimag(wfn[i]*cexp(-I*E0*t));
+          printf("%f  %e  %e\n",x[i],wfndot_an,wfndot_nu);
 //		printf("%f %e %e \n",x[i],creal(wfn[i]),cimag(wfn[i]));
 
 
@@ -152,7 +162,7 @@ void Hpsi(int dim, double complex *psivec, double complex *dpsij, double dx, dou
 	for (j=0; j<dim; j++)
 	{
 		// (1) is placeholder for d^2/dx^2 aka dpsi[i]
-		dpsij[j] = temp[j]/mu - ((0.5*I*k*pow(x[j],2))*(psivec[j])) + (I*(q*E(x[j])*x[j])*(psivec[j]));
+		dpsij[j] = temp[j]/mu - ((0.5*I*k*pow(x[j],2))*(psivec[j])); // + (I*(q*E(x[j])*x[j])*(psivec[j]));
 	}
 
 
