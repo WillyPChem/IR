@@ -99,8 +99,8 @@ int main()
    double complex *wfn_t;
    wfn_t = (complex double *)malloc(dim*sizeof(complex double));
 
-   for (int j=0; j<5000; j++){
-     RK3(dim, x, wfn, dx, 0.02); 
+   for (int j=0; j<10000; j++){
+     RK3(dim, x, wfn, dx, 0.05); 
  
      //t = 0.1*j;
      // print dpsi/dt
