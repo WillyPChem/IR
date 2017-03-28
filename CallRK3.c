@@ -62,10 +62,10 @@ void RK3(int dim, double *xvec, double complex *wfn, double dx, double dt);
 int main()
 {
 	// Initialize & Define Variables
-	int dim = 100;
+	int dim = 200;
 	double *x;
 	double complex *wfn, *dpsi, *dpsij;
-	double L = 10.;
+	double L = 4.;
 	double dx = L/dim;
 	int i;
 
@@ -94,18 +94,20 @@ int main()
     Hpsi(dim,wfn,dpsij,dx,x);
     //void RK3(int dim, double *xvec, double complex *wfn, double dx, double dt) 
   
-
-   for (int j=0; j<10000; j++){
+   int pidx=1;
+   for (int j=0; j<100000; j++){
      RK3(dim, x, wfn, dx, 0.01); 
  
-     printf("\n\n#%i\n",j+1);
-     for (i=0; i<dim; i++)
-	{
-         
-          printf("%f %e %e \n",x[i],creal(wfn[i]),cimag(wfn[i]));
+     if (j%100==0) {
 
+       printf("\n\n#%i\n",pidx);
+       for (i=0; i<dim; i++)
+  	{
+            printf("%f %e %e \n",x[i],creal(wfn[i]),cimag(wfn[i]));
 
 	}
+        pidx++;
+     }
    }
 
     // Free memory
