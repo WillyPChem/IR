@@ -94,30 +94,14 @@ int main()
     Hpsi(dim,wfn,dpsij,dx,x);
     //void RK3(int dim, double *xvec, double complex *wfn, double dx, double dt) 
   
-   double E0 = sqrt(k/mu)/2.;
-   double t=0;
-   double complex *wfn_t;
-   wfn_t = (complex double *)malloc(dim*sizeof(complex double));
 
    for (int j=0; j<10000; j++){
-     RK3(dim, x, wfn, dx, 0.05); 
+     RK3(dim, x, wfn, dx, 0.01); 
  
-     //t = 0.1*j;
-     // print dpsi/dt
      printf("\n\n#%i\n",j+1);
-     /*for (i=0; i<dim; i++) {
-       wfn_t[i] = wfn[i]*cexp(-I*E0*t);
-     }
-     Hpsi(dim, wfn_t, dpsij, dx, x);
-     */
      for (i=0; i<dim; i++)
 	{
          
-          //double wfndot_an = creal(E0*wfn_t[i]);
-          //double wfndot_nu = creal(dpsij[i]);
-          //double rf  = creal(wfn[i]*cexp(-I*E0*t));
-          //double imf = cimag(wfn[i]*cexp(-I*E0*t));
-          //printf("%f  %e  %e\n",x[i],wfndot_an,wfndot_nu);
           printf("%f %e %e \n",x[i],creal(wfn[i]),cimag(wfn[i]));
 
 
@@ -125,12 +109,12 @@ int main()
    }
 
     // Free memory
-//    free(x);
-//    free(wfn);
-//    free(dpsi);
-//    free(dpsij);
+    free(x);
+    free(wfn);
+    free(dpsi);
+    free(dpsij);
 
-	return 0;
+    return 0;
 }
 
 /* **************************************************************************************************** */
