@@ -62,10 +62,10 @@ void RK3(int dim, double *xvec, double complex *wfn, double dx, double dt);
 int main()
 {
 	// Initialize & Define Variables
-	int dim = 200;
+	int dim = 400;
 	double *x;
 	double complex *wfn, *dpsi, *dpsij;
-	double L = 4.;
+	double L = 20.;
 	double dx = L/dim;
 	int i;
 
