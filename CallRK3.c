@@ -96,7 +96,7 @@ int main()
   
    int pidx=1;
    for (int j=0; j<100000; j++){
-     RK3(dim, x, wfn, dx, 0.01); 
+     RK3(dim, x, wfn, dx, 0.001); 
  
      if (j%100==0) {
 
