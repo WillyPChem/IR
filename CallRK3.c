@@ -14,17 +14,17 @@ Step 4: Subtract -qE(t)x term
 
 // Global Constants
 double pi = 4*atan(1.);
-//double alpha = 8.386*pow(10,7);
+double alpha = 0.5502;
 // Reduced mass in SI units
 //double mu = 1.626*pow(10,-27);
 // iReduced mass in atomic units
 double mu = 1784 ;
 //double hbar = 1.0546*pow(10,-34);
 double hbar = 1.;
-double q = 1.60*pow(10,-19);
-double k = 3.08845;
-double om = sqrt(k/mu);
-double alpha = mu*om;
+double q = 1.;
+double k = 0.309;
+
+
 
 // Function Prototypes
 
