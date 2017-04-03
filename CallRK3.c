@@ -36,19 +36,20 @@ void dfdt(int dim, double complex *psivec, double complex *dpsi, double dx);
 	// dx = increment along x axis
 
 // H hat applied to psi
-void Hpsi(int dim, double complex *psivec, double complex *dpsij, double dx, double *x);
+void Hpsi(double t,int dim, double complex *psivec, double complex *dpsij, double dx, double *x);
 	// dim = number of points in wavefxn
 	// psivec = array of wavefxn values
 	// d2psi = array of dpsi^2/dx^2 wavefxn values
 	// dx = increment along x axis
 	// x = location along curve
+	// t = time
 
 // Electronic Field,E(x)
 double E(double x);
 	// x = location along curve
 
 // 3rd Order Runge–Kutta :: Advances wavefxn forward in time
-void RK3(int dim, double *xvec, double complex *wfn, double dx, double dt);
+void RK3(double t,int dim, double *xvec, double complex *wfn, double dx, double dt);
 	// dim = number of points in the wavefunction
 	// xvec = vector of x-values that the wfn is evaluated at
 	// wfn = vector that stores the wfn values at time t_i
@@ -56,6 +57,7 @@ void RK3(int dim, double *xvec, double complex *wfn, double dx, double dt);
 	//		this vector will hold the wfn values at time t_f = t_i + dt
 	// dx = differential step along x between subsequent points in *xvec
 	// dt = differential step along time between subsequent times (i.e. t_f - t_i)
+	// t = time
 
 /* **************************************************************************************************** */
 
@@ -91,12 +93,13 @@ int main()
 	// dfdt(dim,wfn,dpsij,dx);
 */
     // Apply -hbar^2/2mu to Euler Step
-    Hpsi(dim,wfn,dpsij,dx,x);
+    Hpsi(0., dim,wfn,dpsij,dx,x);
     //void RK3(int dim, double *xvec, double complex *wfn, double dx, double dt) 
-  
+   double time; 
    int pidx=1;
    for (int j=0; j<100000; j++){
-     RK3(dim, x, wfn, dx, 0.001); 
+     time = j*0.001;
+     RK3(time, dim, x, wfn, dx, 0.001); 
  
      if (j%100==0) {
 
@@ -134,7 +137,7 @@ void dfdt(int dim,double complex *psivec,double complex *dpsij,double dx) {
 
 /* **************************************************************************************************** */
 
-void Hpsi(int dim, double complex *psivec, double complex *dpsij, double dx, double *x)
+void Hpsi(double t,int dim, double complex *psivec, double complex *dpsij, double dx, double *x)
 {
 
    // A temporary vector for the second derivative of psivec
@@ -151,7 +154,7 @@ void Hpsi(int dim, double complex *psivec, double complex *dpsij, double dx, dou
 	for (j=0; j<dim; j++)
 	{
 		// (1) is placeholder for d^2/dx^2 aka dpsi[i]
-		dpsij[j] = temp[j]/mu - ((0.5*I*k*pow(x[j],2))*(psivec[j])); // + (I*(q*E(x[j])*x[j])*(psivec[j]));
+		dpsij[j] = temp[j]/mu - ((0.5*I*k*pow(x[j],2))*(psivec[j])) + (I*(q*E(t)*x[j])*(psivec[j]));
 	}
 
 
@@ -168,7 +171,7 @@ double E(double x)
 
 /* **************************************************************************************************** */
 
-void RK3(int dim, double *xvec, double complex *wfn, double dx, double dt) {
+void RK3(double t,int dim, double *xvec, double complex *wfn, double dx, double dt) {
 	double complex *wfn_dot, *wfn2, *wfn3, *wfn_np1, *k1, *k2, *k3;
 	int i;
 
@@ -195,7 +198,7 @@ void RK3(int dim, double *xvec, double complex *wfn, double dx, double dt) {
 
 	// Get dPsi(n)/dt at initial time!
 	//dfdt(dim, wfn, wfn_dot, dx);
-        Hpsi(dim, wfn, wfn_dot, dx, xvec);
+        Hpsi(t, dim, wfn, wfn_dot, dx, xvec);
 	// Compute approximate wfn update with Euler step
 	for (i=0; i<=dim; i++)
 	{
@@ -205,7 +208,7 @@ void RK3(int dim, double *xvec, double complex *wfn, double dx, double dt) {
 
 	// Get dPsi(n+k1/2)/dt
 	//dfdt(dim, wfn2, wfn_dot, dx);
-        Hpsi(dim, wfn2, wfn_dot, dx, xvec);
+        Hpsi(t, dim, wfn2, wfn_dot, dx, xvec);
 	
 	// Compute approximate wfn update with Euler step
 	for (i=0; i<=dim; i++)
@@ -216,7 +219,7 @@ void RK3(int dim, double *xvec, double complex *wfn, double dx, double dt) {
 
 	// Get dPsi(n+k2/2)/dt
 	//dfdt(dim, wfn3, wfn_dot, dx);
-        Hpsi(dim, wfn3, wfn_dot, dx, xvec);
+        Hpsi(t, dim, wfn3, wfn_dot, dx, xvec);
 	
 	// Compute approximate update with Euler step
 
