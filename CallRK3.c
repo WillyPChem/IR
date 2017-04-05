@@ -106,7 +106,7 @@ int main()
        printf("\n\n#%i\n",pidx);
        for (i=0; i<dim; i++)
   	{
-            printf("%f %e %e \n",x[i],creal(wfn[i]),cimag(wfn[i]));
+            printf("%f %e %e \n",x[i],creal(wfn[i]),creal( conj(wfn[i])*wfn[i]));
 
 	}
         pidx++;
