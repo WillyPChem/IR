@@ -97,11 +97,11 @@ int main()
     //void RK3(int dim, double *xvec, double complex *wfn, double dx, double dt) 
    double time; 
    int pidx=1;
-   for (int j=0; j<100000; j++){
+   for (int j=0; j<1000000; j++){
      time = j*0.001;
      RK3(time, dim, x, wfn, dx, 0.001); 
  
-     if (j%100==0) {
+     if (j%1000==0) {
 
        printf("\n\n#%i\n",pidx);
        for (i=0; i<dim; i++)
