@@ -165,7 +165,7 @@ void Hpsi(double t,int dim, double complex *psivec, double complex *dpsij, doubl
 double E(double x)
 {
    double field;	
-   field = 0.001*cos(0.00209*x) + 0.001*cos(0.00209*2*x);
+   field = 0.01*cos(0.00209*x) + 0.01*cos(0.00209*2*x);
    return field;
 }
 
