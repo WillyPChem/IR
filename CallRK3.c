@@ -14,7 +14,7 @@ Step 4: Subtract -qE(t)x term
 
 // Global Constants
 double pi = 4*atan(1.);
-double alpha = 0.5502;
+//double alpha = 0.5502;
 // Reduced mass in SI units
 //double mu = 1.626*pow(10,-27);
 // iReduced mass in atomic units
@@ -23,7 +23,7 @@ double mu = 1784 ;
 double hbar = 1.;
 double q = 1.;
 double k = 0.309;
-
+double alpha = sqrt(mu*k);
 
 
 // Function Prototypes
@@ -166,7 +166,7 @@ double E(double x)
 {
    double field;	
    field = cos(15117*x) + cos(188972*x);
-   return field;
+   return 0;
 }
 
 /* **************************************************************************************************** */
