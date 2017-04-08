@@ -106,7 +106,7 @@ int main()
        printf("\n\n#%i\n",pidx);
        for (i=0; i<dim; i++)
   	{
-            printf("%f %e %e \n",x[i],creal(wfn[i]),creal( conj(wfn[i])*wfn[i]));
+            printf("%f %e %e %e  %e\n",x[i],creal(wfn[i]),creal( conj(wfn[i])*wfn[i]), (k/2.)*x[i]*x[i], -q*E(time)*x[i]);
 
 	}
         pidx++;
