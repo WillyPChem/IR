@@ -10,6 +10,7 @@ Step 1: Take 2nd derivative of Psi(x) = ground-state harmonic oscillator
 Step 2: Multiply by -hbar^2/2mu
 Step 3: Add 1/2kx^2 term
 Step 4: Subtract -qE(t)x term
+That generates psi_dot
 */
 
 // Global Constants
