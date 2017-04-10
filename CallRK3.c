@@ -1,9 +1,9 @@
 #include<stdlib.h>
 #include<stdio.h>
 #include<math.h>
-#include<complex.h>
+#include</usr/include/complex.h>
 // I = imaginary unit
-#include<malloc.h>
+#include</usr/include/malloc/malloc.h>
 
 /*
 Step 1: Take 2nd derivative of Psi(x) = ground-state harmonic oscillator
@@ -19,11 +19,13 @@ double pi = 4*atan(1.);
 // Reduced mass in SI units
 //double mu = 1.626*pow(10,-27);
 // iReduced mass in atomic units
-double mu = 1784 ;
+//double mu = 1784 ;
+double mu = 200.;
 //double hbar = 1.0546*pow(10,-34);
 double hbar = 1.;
 double q = 1.;
 double k = 0.309;
+//double k = 1.;
 double alpha = sqrt(mu*k);
 
 
@@ -37,20 +39,20 @@ void dfdt(int dim, double complex *psivec, double complex *dpsi, double dx);
 	// dx = increment along x axis
 
 // H hat applied to psi
-void Hpsi(double t,int dim, double complex *psivec, double complex *dpsij, double dx, double *x);
+double Hpsi(double t,int dim, double complex *psivec, double complex *dpsij, double dx, double *x);
 	// dim = number of points in wavefxn
 	// psivec = array of wavefxn values
 	// d2psi = array of dpsi^2/dx^2 wavefxn values
 	// dx = increment along x axis
 	// x = location along curve
 	// t = time
-
-// Electronic Field,E(x)
-double E(double x);
-	// x = location along curve
+        // Returns energy from <Psi | H_0 | Psi>
+// Electronic Field,E(t)
+double E(double t);
+	// t = current time
 
 // 3rd Order Runge–Kutta :: Advances wavefxn forward in time
-void RK3(double t,int dim, double *xvec, double complex *wfn, double dx, double dt);
+double RK3(double t,int dim, double *xvec, double complex *wfn, double dx, double dt);
 	// dim = number of points in the wavefunction
 	// xvec = vector of x-values that the wfn is evaluated at
 	// wfn = vector that stores the wfn values at time t_i
@@ -59,6 +61,10 @@ void RK3(double t,int dim, double *xvec, double complex *wfn, double dx, double 
 	// dx = differential step along x between subsequent points in *xvec
 	// dt = differential step along time between subsequent times (i.e. t_f - t_i)
 	// t = time
+        // Returns Energy at current time
+
+// Function to compute dipole moment expectation value
+double complex DipoleMoment(int dim, double *xvec, double complex *wfn, double dx); 
 
 /* **************************************************************************************************** */
 
@@ -68,8 +74,9 @@ int main()
 	int dim = 400;
 	double *x;
 	double complex *wfn, *dpsi, *dpsij;
-	double L = 20.;
+	double L = 16.;
 	double dx = L/dim;
+        double dt = 0.0005;
 	int i;
 
 	// Arrays via malloc()
@@ -84,47 +91,44 @@ int main()
 		x[i] = (i-dim/2)*dx;
 		wfn[i] = pow( (alpha/pi) , (1./4))*exp((-alpha/2.)*pow(x[i],2.));
 
-		// Particle in a box
-		//wfn[i] = sqrt(2./L)*sin(pi*x[i]/L) + 0.*I;
-		//printf("wfn[%d] = %e %e*i\n",i,creal(wfn[i]),cimag(wfn[i]));
 	}
 
-/*	printf("\n\n");
-	// Euler Step
-	// dfdt(dim,wfn,dpsij,dx);
-*/
-    // Apply -hbar^2/2mu to Euler Step
-    Hpsi(0., dim,wfn,dpsij,dx,x);
-    //void RK3(int dim, double *xvec, double complex *wfn, double dx, double dt) 
-   double time; 
-   int pidx=1;
-   for (int j=0; j<1000000; j++){
-     time = j*0.001;
-     RK3(time, dim, x, wfn, dx, 0.001); 
- 
-     if (j%1000==0) {
+        double time; 
+        int pidx=1;
+        double complex dpm;
+        double Et, Ei;
+        FILE *dpfp;
+        dpfp = fopen("DipoleMoment.txt","w");
+        Ei = 0.5*sqrt(k/mu);
+        fprintf(dpfp, " Time (a.u.) \t Real(mu)  \t Im(mu) \t  E(t=0) (a.u.)  \t E(t) (a.u.)\n");
 
-       printf("\n\n#%i\n",pidx);
-       for (i=0; i<dim; i++)
-  	{
-            printf("%f %e %e %e  %e\n",x[i],creal(wfn[i]),creal( conj(wfn[i])*wfn[i]), (k/2.)*x[i]*x[i], -q*E(time)*x[i]);
+        for (int j=0; j<20000000; j++){
+          time = j*dt;
+          Et = RK3(time, dim, x, wfn, dx, dt); 
+          dpm = DipoleMoment(dim, x, wfn, dx);
+          fprintf(dpfp, " %12.10f  %12.10e  %12.10e  %12.10e  %12.10e  \n",time,creal(dpm),cimag(dpm),Ei, Et);
 
-	}
-        pidx++;
-     }
-   }
+          if (j%10000==0) {
 
-    // Free memory
+            printf("\n\n#%i\n",pidx);
+            for (i=0; i<dim; i++) {
+                  printf("%f %e %e %e  %e\n",x[i],creal(wfn[i]),creal( conj(wfn[i])*wfn[i]), (k/2.)*x[i]*x[i], -q*E(time)*x[i]);
+
+	    }
+            pidx++;
+          }
+        }
+
     free(x);
     free(wfn);
     free(dpsi);
     free(dpsij);
-
+    fclose(dpfp);
     return 0;
 }
 
 /* **************************************************************************************************** */
-
+// Just finite difference second derivative of psi -> dpsi
 void dfdt(int dim,double complex *psivec,double complex *dpsij,double dx) {
 	int j;
 	dpsij[0] = 0. + 0.*I;
@@ -132,15 +136,17 @@ void dfdt(int dim,double complex *psivec,double complex *dpsij,double dx) {
 
 	for (j=1; j<dim; j++)
 	{
-		dpsij[j] = (1.*I/2)*((psivec[j+1] - (2*psivec[j]) + psivec[j-1])/(dx*dx));
+		dpsij[j] = (psivec[j+1] - 2.*psivec[j] + psivec[j-1])/(dx*dx);
 	}
 }
 
 /* **************************************************************************************************** */
 
-void Hpsi(double t,int dim, double complex *psivec, double complex *dpsij, double dx, double *x)
+
+double Hpsi(double t,int dim, double complex *psivec, double complex *dpsij, double dx, double *x)
 {
 
+   double complex Et;
    // A temporary vector for the second derivative of psivec
    double complex *temp;
    temp = (double complex *)malloc((dim+1)*sizeof(double complex));
@@ -152,30 +158,37 @@ void Hpsi(double t,int dim, double complex *psivec, double complex *dpsij, doubl
 
 
 	int j;
+        Et = 0. + 0.*I;
 	for (j=0; j<dim; j++)
 	{
 		// (1) is placeholder for d^2/dx^2 aka dpsi[i]
-		dpsij[j] = temp[j]/mu - ((0.5*I*k*pow(x[j],2))*(psivec[j])) + (I*(q*E(t)*x[j])*(psivec[j]));
+		dpsij[j] = I*temp[j]/(2*mu) - 0.5*I*k*pow(x[j],2)*psivec[j] + I*q*E(t)*x[j]*psivec[j];
+                // sum psi^* H psi dx
+                Et += conj(psivec[j])*(0.5*k*pow(x[j],2)*psivec[j] - temp[j]/(2*mu))*dx;
+                dpsij[j] += I*q*E(t)*x[j]*psivec[j];
 	}
 
 
    free(temp);
+   return creal(Et);
 }
 /* **************************************************************************************************** */
 
 double E(double x)
 {
-   double field;	
-   field = 0.1*cos(0.00209*x) + 0.1*cos(0.00209*2*x);
+   double field;
+   double f1 = 0.5*sqrt(k/mu);
+   double f2 = sqrt(k/mu);	
+   field = 0.1*cos(f1*x) + 0.1*cos(f2*x);
    return field;
 }
 
 /* **************************************************************************************************** */
 
-void RK3(double t,int dim, double *xvec, double complex *wfn, double dx, double dt) {
+double RK3(double t,int dim, double *xvec, double complex *wfn, double dx, double dt) {
 	double complex *wfn_dot, *wfn2, *wfn3, *wfn_np1, *k1, *k2, *k3;
 	int i;
-
+        double E0, E1, E2;
 	// Temporary arrays for computing derivatives of wfns and approximate updates to wfns
 	wfn_dot = (double complex *)malloc((dim+1)*sizeof(double complex));
 	wfn2 = (double complex *)malloc((dim+1)*sizeof(double complex));
@@ -186,6 +199,7 @@ void RK3(double t,int dim, double *xvec, double complex *wfn, double dx, double 
 	k3 = (double complex *)malloc((dim+1)*sizeof(double complex));
 
   //Initialize all (real and imaginary parts) to zero
+        printf("  dx is %f\n",dx);
 	for (i=0; i<=dim; i++)
 	{
 		wfn_dot[i] = 0. + 0.*I;
@@ -199,7 +213,7 @@ void RK3(double t,int dim, double *xvec, double complex *wfn, double dx, double 
 
 	// Get dPsi(n)/dt at initial time!
 	//dfdt(dim, wfn, wfn_dot, dx);
-        Hpsi(t, dim, wfn, wfn_dot, dx, xvec);
+        E0 = Hpsi(t, dim, wfn, wfn_dot, dx, xvec);
 	// Compute approximate wfn update with Euler step
 	for (i=0; i<=dim; i++)
 	{
@@ -209,7 +223,7 @@ void RK3(double t,int dim, double *xvec, double complex *wfn, double dx, double 
 
 	// Get dPsi(n+k1/2)/dt
 	//dfdt(dim, wfn2, wfn_dot, dx);
-        Hpsi(t, dim, wfn2, wfn_dot, dx, xvec);
+        E1 = Hpsi((t+dt/2.), dim, wfn2, wfn_dot, dx, xvec);
 	
 	// Compute approximate wfn update with Euler step
 	for (i=0; i<=dim; i++)
@@ -220,7 +234,7 @@ void RK3(double t,int dim, double *xvec, double complex *wfn, double dx, double 
 
 	// Get dPsi(n+k2/2)/dt
 	//dfdt(dim, wfn3, wfn_dot, dx);
-        Hpsi(t, dim, wfn3, wfn_dot, dx, xvec);
+        E2 = Hpsi((t+dt/2.), dim, wfn3, wfn_dot, dx, xvec);
 	
 	// Compute approximate update with Euler step
 
@@ -243,4 +257,23 @@ void RK3(double t,int dim, double *xvec, double complex *wfn, double dx, double 
 	free(k1);
 	free(k2);
 	free(k3);
+
+        return E0;
+
 }
+// Compute dipole moment given current wavefunction and dipole operator:
+// mu = <Psi | mu | Psi> = <Psi | -q x | Psi>
+double complex DipoleMoment(int dim, double *xvec, double complex *wfn, double dx) {
+  double complex mu;
+  mu = 0. + 0.*I;
+
+  for (int i=0; i<dim; i++) {
+
+    mu -= conj(wfn[i])*q*xvec[i]*wfn[i]*dx;
+
+  }
+
+  return mu;
+
+}
+
