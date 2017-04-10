@@ -1,9 +1,9 @@
 #include<stdlib.h>
 #include<stdio.h>
 #include<math.h>
-#include</usr/include/complex.h>
+#include<complex.h>
 // I = imaginary unit
-#include</usr/include/malloc/malloc.h>
+#include<malloc.h>
 
 /*
 Step 1: Take 2nd derivative of Psi(x) = ground-state harmonic oscillator
