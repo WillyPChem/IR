@@ -15,17 +15,18 @@ That generates psi_dot
 
 // Global Constants
 double pi = 4*atan(1.);
-//double alpha = 0.5502;
+// double alpha = 0.5502;
 // Reduced mass in SI units
-//double mu = 1.626*pow(10,-27);
-// iReduced mass in atomic units
-//double mu = 1784 ;
-double mu = 200.;
-//double hbar = 1.0546*pow(10,-34);
+// double mu = 1.626*pow(10,-27);
+// Reduced mass in atomic units - verified for HCl
+double mu = 1784 ;
+// double mu = 200.;
+// double hbar = 1.0546*pow(10,-34);
 double hbar = 1.;
 double q = 1.;
+// Force constant in atomic units - verified for HCl
 double k = 0.309;
-//double k = 1.;
+// double k = 1.;
 double alpha = sqrt(mu*k);
 
 
@@ -65,7 +66,8 @@ double RK3(double t,int dim, double *xvec, double complex *wfn, double dx, doubl
 
 // Function to compute dipole moment expectation value
 double complex DipoleMoment(int dim, double *xvec, double complex *wfn, double dx); 
-
+void Fourier (double complex *dm, int n);
+//void Fourier (const double inreal [], double outreal [], double outimag [], int n);
 /* **************************************************************************************************** */
 
 int main()
@@ -73,7 +75,7 @@ int main()
 	// Initialize & Define Variables
 	int dim = 400;
 	double *x;
-	double complex *wfn, *dpsi, *dpsij;
+	double complex *dm, *wfn, *dpsi, *dpsij;
 	double L = 16.;
 	double dx = L/dim;
         double dt = 0.0005;
@@ -82,6 +84,7 @@ int main()
 	// Arrays via malloc()
 	x = (double *)malloc(dim*sizeof(double));
 	wfn = (double complex *)malloc(dim*sizeof(double complex));
+        dm = (double complex *)malloc(20000000*sizeof(double complex));
 	dpsi = (double complex *)malloc(dim*sizeof(double complex));
 	dpsij = (double complex *)malloc((dim+1)*sizeof(double complex));
 
@@ -102,13 +105,13 @@ int main()
         Ei = 0.5*sqrt(k/mu);
         fprintf(dpfp, " Time (a.u.) \t Real(mu)  \t Im(mu) \t  E(t=0) (a.u.)  \t E(t) (a.u.)\n");
 
-        for (int j=0; j<20000000; j++){
+        for (int j=0; j<1000; j++){
           time = j*dt;
           Et = RK3(time, dim, x, wfn, dx, dt); 
-          dpm = DipoleMoment(dim, x, wfn, dx);
+          dm[j] = DipoleMoment(dim, x, wfn, dx);
           fprintf(dpfp, " %12.10f  %12.10e  %12.10e  %12.10e  %12.10e  \n",time,creal(dpm),cimag(dpm),Ei, Et);
 
-          if (j%10000==0) {
+          if (j%1000==0) {
 
             printf("\n\n#%i\n",pidx);
             for (i=0; i<dim; i++) {
@@ -118,6 +121,8 @@ int main()
             pidx++;
           }
         }
+
+        Fourier(dm, 1);
 
     free(x);
     free(wfn);
@@ -199,7 +204,7 @@ double RK3(double t,int dim, double *xvec, double complex *wfn, double dx, doubl
 	k3 = (double complex *)malloc((dim+1)*sizeof(double complex));
 
   //Initialize all (real and imaginary parts) to zero
-        printf("  dx is %f\n",dx);
+        //printf("  dx is %f\n",dx);
 	for (i=0; i<=dim; i++)
 	{
 		wfn_dot[i] = 0. + 0.*I;
@@ -264,16 +269,36 @@ double RK3(double t,int dim, double *xvec, double complex *wfn, double dx, doubl
 // Compute dipole moment given current wavefunction and dipole operator:
 // mu = <Psi | mu | Psi> = <Psi | -q x | Psi>
 double complex DipoleMoment(int dim, double *xvec, double complex *wfn, double dx) {
-  double complex mu;
-  mu = 0. + 0.*I;
+  double complex dm;
+  dm = 0. + 0.*I;
 
   for (int i=0; i<dim; i++) {
 
-    mu -= conj(wfn[i])*q*xvec[i]*wfn[i]*dx;
+    dm -= conj(wfn[i])*q*xvec[i]*wfn[i]*dx;
 
   }
 
-  return mu;
+  return dm;
 
 }
-
+/***************************************************************************/
+void Fourier (double complex *dm, int n){
+  double wmin=4.55e-3;
+  double wmax=0.057;
+  int maxk = 100;
+  double dw = (wmax-wmin)/maxk;
+ 
+  for (int k = 0; k <=maxk; k++) {
+    double sumreal = 0;
+    double sumimag = 0;
+    double  w = wmin+k*dw;
+    for (int t = 0; t < 2000000; t++){
+      double angle = t*w/n;
+      sumreal += creal(dm[t]) * cos(angle) + 0. * sin(angle);
+      sumimag  += -creal(dm[t]) * sin(angle) + 0. * cos(angle);
+      }
+      printf(" Sumreal is %12.10e  Sumimag is %12.10e\n",sumreal,sumimag);
+    //outreal[t] = sumreal;
+    //outimag[t] = sumimag;
+  }
+}
