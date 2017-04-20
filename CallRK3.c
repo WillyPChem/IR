@@ -105,7 +105,7 @@ int main()
         // Period of slowest oscillation
         SlowPeriod = 1./Ei;
         // Must run for at least 1 period of slowest oscillation, but will run a bit longer
-        MAX_TIME = (int)(4*SlowPeriod/dt); 
+        MAX_TIME = (int)(10*SlowPeriod/dt); 
         printf("  MAX_TIME is %i\n",MAX_TIME);
 
         // Dipole moment array must be at least MAX_TIME long - will also zero pad for good measure
@@ -117,7 +117,7 @@ int main()
           time = j*dt;
           Et = RK3(time, dim, x, wfn, dx); 
           dm[j] = DipoleMoment(dim, x, wfn, dx);
-          fprintf(dpfp, " %12.10f  %12.10e  %12.10e  %12.10e  %12.10e  \n",time,creal(dpm),cimag(dpm),Ei, Et);
+          fprintf(dpfp, " %12.10f  %12.10e  %12.10e  %12.10e  %12.10e  \n",time,creal(dm[j]),cimag(dm[j]),Ei, Et);
 
           if (j%500==0) {
 
@@ -195,10 +195,23 @@ double Hpsi(double t,int dim, double complex *psivec, double complex *dpsij, dou
 
 double E(double x)
 {
+   double Emax= 0.0005;
+   double sigma = 200;
    double field;
    double f1 = 0.5*sqrt(k/mu);
    double f2 = sqrt(k/mu);	
-   field = 0.1*cos(f1*x) + 0.1*cos(f2*x);
+   double amplitude;
+   if (x<sigma) {
+
+     amplitude = Emax*sin(pi*x/(2*sigma))*sin(pi*x/(2*sigma));
+   }
+   else {
+ 
+     amplitude = 0.;
+
+   }
+
+   field = amplitude*(sin(f1*x) + sin(f2*x));
    return field;
 }
 
@@ -299,8 +312,8 @@ double complex DipoleMoment(int dim, double *xvec, double complex *wfn, double d
 void Fourier (double complex *dm, int n){
   FILE *fp;
   fp = fopen("Absorption_Spectrum.txt","w");
-  double wmin=4.55e-3;
-  double wmax=0.057;
+  double wmin=0.1*sqrt(k/mu);
+  double wmax=4*sqrt(k/mu);
   int maxk = 500;
   double dw = (wmax-wmin)/maxk;
   double time;
@@ -312,7 +325,7 @@ void Fourier (double complex *dm, int n){
 
     for (int t = 0; t < n; t++){
       time = dt*t;
-      double angle = t*w;
+      double angle = time*w;
       sumreal += creal(dm[t]) * cos(angle) + 0. * sin(angle);
       sumimag  += -creal(dm[t]) * sin(angle) + 0. * cos(angle);
     }
