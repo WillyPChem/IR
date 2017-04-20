@@ -28,7 +28,9 @@ double q = 1.;
 double k = 0.309;
 // double k = 1.;
 double alpha = sqrt(mu*k);
-
+// Timestep
+double dt = 0.001;
+int MAX_TIME;
 
 // Function Prototypes
 
@@ -53,7 +55,7 @@ double E(double t);
 	// t = current time
 
 // 3rd Order Runge–Kutta :: Advances wavefxn forward in time
-double RK3(double t,int dim, double *xvec, double complex *wfn, double dx, double dt);
+double RK3(double t,int dim, double *xvec, double complex *wfn, double dx);
 	// dim = number of points in the wavefunction
 	// xvec = vector of x-values that the wfn is evaluated at
 	// wfn = vector that stores the wfn values at time t_i
@@ -75,43 +77,49 @@ int main()
 	// Initialize & Define Variables
 	int dim = 400;
 	double *x;
-	double complex *dm, *wfn, *dpsi, *dpsij;
+	double complex dpm, *dm, *wfn, *dpsi, *dpsij;
 	double L = 16.;
 	double dx = L/dim;
-        double dt = 0.0005;
-	int i;
+	int i, pidx;
+        double time, Et, Ei, SlowPeriod;
+        FILE *dpfp;        
+ 
+        // Open Dipole Moment File
+        dpfp = fopen("DipoleMoment.txt","w");
 
 	// Arrays via malloc()
 	x = (double *)malloc(dim*sizeof(double));
 	wfn = (double complex *)malloc(dim*sizeof(double complex));
-        dm = (double complex *)malloc(20000000*sizeof(double complex));
 	dpsi = (double complex *)malloc(dim*sizeof(double complex));
 	dpsij = (double complex *)malloc((dim+1)*sizeof(double complex));
 
-	// Psi(x)
+	// Psi(x) - initialize as ground state wf
 	for (i=0; i<dim; i++)
 	{
 		x[i] = (i-dim/2)*dx;
 		wfn[i] = pow( (alpha/pi) , (1./4))*exp((-alpha/2.)*pow(x[i],2.));
 
 	}
-
-        double time; 
-        int pidx=1;
-        double complex dpm;
-        double Et, Ei;
-        FILE *dpfp;
-        dpfp = fopen("DipoleMoment.txt","w");
+        // Ground state energy - aka slowest frequency in the system
         Ei = 0.5*sqrt(k/mu);
-        fprintf(dpfp, " Time (a.u.) \t Real(mu)  \t Im(mu) \t  E(t=0) (a.u.)  \t E(t) (a.u.)\n");
+        // Period of slowest oscillation
+        SlowPeriod = 1./Ei;
+        // Must run for at least 1 period of slowest oscillation, but will run a bit longer
+        MAX_TIME = (int)(4*SlowPeriod/dt); 
+        printf("  MAX_TIME is %i\n",MAX_TIME);
 
-        for (int j=0; j<1000; j++){
+        // Dipole moment array must be at least MAX_TIME long - will also zero pad for good measure
+        dm = (double complex *)malloc((MAX_TIME+10000)*sizeof(double complex));
+
+        fprintf(dpfp, " Time (a.u.) \t Real(mu)  \t Im(mu) \t  E(t=0) (a.u.)  \t E(t) (a.u.)\n");
+        pidx=1;
+        for (int j=0; j<MAX_TIME; j++){
           time = j*dt;
-          Et = RK3(time, dim, x, wfn, dx, dt); 
+          Et = RK3(time, dim, x, wfn, dx); 
           dm[j] = DipoleMoment(dim, x, wfn, dx);
           fprintf(dpfp, " %12.10f  %12.10e  %12.10e  %12.10e  %12.10e  \n",time,creal(dpm),cimag(dpm),Ei, Et);
 
-          if (j%1000==0) {
+          if (j%500==0) {
 
             printf("\n\n#%i\n",pidx);
             for (i=0; i<dim; i++) {
@@ -121,15 +129,21 @@ int main()
             pidx++;
           }
         }
+        // Dipole moment information collected - now zero pad
+        for (int j=0; j<10000; j++) {
+          dm[MAX_TIME+j] = 0. + 0.*I;
+        }
 
-        Fourier(dm, 1);
 
-    free(x);
-    free(wfn);
-    free(dpsi);
-    free(dpsij);
-    fclose(dpfp);
-    return 0;
+        Fourier(dm, MAX_TIME+10000);
+
+        free(x);
+        free(wfn);
+        free(dpsi);
+        free(dpsij);
+        fclose(dpfp);
+        free(dm);
+        return 0;
 }
 
 /* **************************************************************************************************** */
@@ -190,7 +204,7 @@ double E(double x)
 
 /* **************************************************************************************************** */
 
-double RK3(double t,int dim, double *xvec, double complex *wfn, double dx, double dt) {
+double RK3(double t,int dim, double *xvec, double complex *wfn, double dx) {
 	double complex *wfn_dot, *wfn2, *wfn3, *wfn_np1, *k1, *k2, *k3;
 	int i;
         double E0, E1, E2;
@@ -283,22 +297,26 @@ double complex DipoleMoment(int dim, double *xvec, double complex *wfn, double d
 }
 /***************************************************************************/
 void Fourier (double complex *dm, int n){
+  FILE *fp;
+  fp = fopen("Absorption_Spectrum.txt","w");
   double wmin=4.55e-3;
   double wmax=0.057;
-  int maxk = 100;
+  int maxk = 500;
   double dw = (wmax-wmin)/maxk;
+  double time;
  
   for (int k = 0; k <=maxk; k++) {
     double sumreal = 0;
     double sumimag = 0;
     double  w = wmin+k*dw;
-    for (int t = 0; t < 2000000; t++){
-      double angle = t*w/n;
+
+    for (int t = 0; t < n; t++){
+      time = dt*t;
+      double angle = t*w;
       sumreal += creal(dm[t]) * cos(angle) + 0. * sin(angle);
       sumimag  += -creal(dm[t]) * sin(angle) + 0. * cos(angle);
-      }
-      printf(" Sumreal is %12.10e  Sumimag is %12.10e\n",sumreal,sumimag);
-    //outreal[t] = sumreal;
-    //outimag[t] = sumimag;
+    }
+    fprintf(fp," %12.10e  %12.10e\n",w,sumreal*sumreal+sumimag*sumimag);
   }
+  fclose(fp);
 }
