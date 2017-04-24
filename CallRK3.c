@@ -330,7 +330,7 @@ void Fourier (double complex *dm, int n){
       sumreal += creal(dm[t]) * cos(angle) + 0. * sin(angle);
       sumimag  += -creal(dm[t]) * sin(angle) + 0. * cos(angle);
     }
-    fprintf(fp," %12.10e  %12.10e\n",w*(2194748258.263),sumreal*sumreal+sumimag*sumimag);
+    fprintf(fp," %12.10e  %12.10e\n",w*(21947482.58263),sumreal*sumreal+sumimag*sumimag);
   }
   fclose(fp);
 }
