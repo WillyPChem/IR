@@ -15,17 +15,20 @@ That generates psi_dot
 
 // Global Constants
 double pi = 4*atan(1.);
-// double alpha = 0.5502;
+// Alpha in atomic units - verified for HCl-0.5502
+// Alpha in atomic units - verified for HBr-0.512
 // Reduced mass in SI units
 // double mu = 1.626*pow(10,-27);
-// Reduced mass in atomic units - verified for HCl
-double mu = 1784 ;
+// Reduced mass in atomic units - verified for HCl-1784 
+// Reduced mass in atomic units - verified for HBr-1813
+double mu = 1813 ;
 // double mu = 200.;
 // double hbar = 1.0546*pow(10,-34);
 double hbar = 1.;
 double q = 1.;
-// Force constant in atomic units - verified for HCl
-double k = 0.309;
+// Force constant in atomic units - verified for HCl-0.309
+// Force constant in atomic units - verified for HBr-0.263
+double k = 0.263;
 // double k = 1.;
 double alpha = sqrt(mu*k);
 // Timestep
@@ -85,7 +88,7 @@ int main()
         FILE *dpfp;        
  
         // Open Dipole Moment File
-        dpfp = fopen("DipoleMoment.txt","w");
+        dpfp = fopen("DipoleMoment_HBr.txt","w");
 
 	// Arrays via malloc()
 	x = (double *)malloc(dim*sizeof(double));
@@ -312,7 +315,7 @@ double complex DipoleMoment(int dim, double *xvec, double complex *wfn, double d
 /***************************************************************************/
 void Fourier (double complex *dm, int n){
   FILE *fp;
-  fp = fopen("Absorption_Spectrum.txt","w");
+  fp = fopen("Absorption_Spectrum_HBr.txt","w");
   double wmin=0.1*sqrt(k/mu);
   double wmax=4*sqrt(k/mu);
   int maxk = 500;
