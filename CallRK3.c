@@ -121,7 +121,7 @@ int main()
           Et = RK3(time, dim, x, wfn, dx); 
           dm[j] = DipoleMoment(dim, x, wfn, dx);
 
-          if (j%500==0) {
+          if (j%800==0) {
 
             fprintf(dpfp, " %12.10f  %12.10e  %12.10e  %12.10e  %12.10e  \n",time,creal(dm[j]),cimag(dm[j]),Ei, Et);
             printf("\n\n#%i\n",pidx);
@@ -199,7 +199,7 @@ double Hpsi(double t,int dim, double complex *psivec, double complex *dpsij, dou
 
 double E(double x)
 {
-   double Emax= 0.005;
+   double Emax= 0.05;
    double sigma = 200;
    double field;
    double f1 = 0.5*sqrt(k/mu);
